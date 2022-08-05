@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { first } from 'rxjs/operators';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 @Component({
   selector: 'app-tables',
@@ -7,9 +9,37 @@ import { Component, OnInit } from '@angular/core';
 })
 export class TablesComponent implements OnInit {
 
-  constructor() { }
+  loggedInUser: any = {};
+  AllExpenses: any = [];
+  AllMyExpenses: any = [];
+
+  constructor(private authService: AuthService) { }
 
   ngOnInit() {
+    this.loggedInUser = this.authService.currentUser();    
+
+    this.authService.getAllExpenses().pipe(first()).subscribe(
+      (data) => {
+        if(data.status == 'OK') {
+          this.AllExpenses = data.expenses_list;
+          console.log(this.AllExpenses);
+        }
+      },
+      (error) => {
+        console.log(error);
+      });
+
+    this.authService.getAllMyExpenses().pipe(first()).subscribe(
+      (data) => {
+        if(data.status == 'OK') {
+          this.AllMyExpenses = data.expenses_list;
+          console.log(this.AllExpenses);
+        }
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
   }
 
 }
